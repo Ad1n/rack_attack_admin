@@ -10,9 +10,9 @@ class Rack::Attack
       store, namespace = cache_store_and_namespace_to_strip
       keys = store.keys
       if namespace
-        keys.map {|key| key.to_s.sub(/^#{namespace}:/, '') }
+        keys.map { |key| encode_to_utf8(key).to_s.sub(/^#{namespace}:/, '') }
       else
-        keys
+        keys.map { |key| encode_to_utf8(key) }
       end
     end
 
@@ -76,6 +76,10 @@ class Rack::Attack
 
     def unprefix_key(key)
       key.sub "#{cache.prefix}:", ''
+    end
+
+    def encode_to_utf8(key)
+      key.force_encoding('UTF-8').encode!('UTF-8', 'UTF-8', invalid: :replace, undef: :replace, replace: '')
     end
 
     def to_h
